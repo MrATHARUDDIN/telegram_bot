@@ -1,0 +1,419 @@
+{
+  "matches": [
+    {
+      "date": "2025-10-18",
+      "homeTeam": "Hungary",
+      "awayTeam": "Armenia",
+      "status": "FINISHED",
+      "score": {
+        "home": 2,
+        "away": 0
+      },
+      "homeFlag": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Flag_of_Hungary.svg",
+      "awayFlag": "https://upload.wikimedia.org/wikipedia/commons/2/2f/Flag_of_Armenia.svg"
+    },
+    {
+      "date": "2025-10-18",
+      "homeTeam": "Bulgaria",
+      "awayTeam": "Turkey",
+      "status": "FINISHED",
+      "score": {
+        "home": 1,
+        "away": 6
+      },
+      "homeFlag": "https://upload.wikimedia.org/wikipedia/commons/9/9a/Flag_of_Bulgaria.svg",
+      "awayFlag": "https://upload.wikimedia.org/wikipedia/commons/b/b4/Flag_of_Turkey.svg"
+    },
+    {
+      "date": "2025-10-18",
+      "homeTeam": "Serbia",
+      "awayTeam": "Albania",
+      "status": "FINISHED",
+      "score": {
+        "home": 0,
+        "away": 1
+      },
+      "homeFlag": "https://upload.wikimedia.org/wikipedia/commons/f/ff/Flag_of_Serbia.svg",
+      "awayFlag": "https://upload.wikimedia.org/wikipedia/commons/3/36/Flag_of_Albania.svg"
+    },
+    {
+      "date": "2025-10-18",
+      "homeTeam": "Latvia",
+      "awayTeam": "Andorra",
+      "status": "FINISHED",
+      "score": {
+        "home": 2,
+        "away": 2
+      },
+      "homeFlag": "https://upload.wikimedia.org/wikipedia/commons/8/84/Flag_of_Latvia.svg",
+      "awayFlag": "https://upload.wikimedia.org/wikipedia/commons/1/11/Flag_of_Andorra.svg"
+    },
+    {
+      "date": "2025-10-27",
+      "homeTeam": "Chile",
+      "awayTeam": "Colombia",
+      "status": "FINISHED",
+      "score": {
+        "home": 2,
+        "away": 2
+      },
+      "homeFlag": "https://upload.wikimedia.org/wikipedia/commons/7/78/Flag_of_Chile.svg",
+      "awayFlag": "https://upload.wikimedia.org/wikipedia/commons/2/22/Flag_of_Colombia.svg"
+    },
+    {
+      "date": "2025-10-19",
+      "homeTeam": "Peru",
+      "awayTeam": "Uruguay",
+      "status": "FINISHED",
+      "score": {
+        "home": 1,
+        "away": 1
+      },
+      "homeFlag": "https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Peru.svg",
+      "awayFlag": "https://upload.wikimedia.org/wikipedia/commons/f/fe/Flag_of_Uruguay.svg"
+    },
+    {
+      "date": "2025-10-19",
+      "homeTeam": "Canada",
+      "awayTeam": "Mexico",
+      "status": "FINISHED",
+      "score": {
+        "home": 0,
+        "away": 2
+      },
+      "homeFlag": "https://upload.wikimedia.org/wikipedia/commons/c/cf/Flag_of_Canada.svg",
+      "awayFlag": "https://upload.wikimedia.org/wikipedia/commons/f/fc/Flag_of_Mexico.svg"
+    },
+    {
+      "date": "2025-10-19",
+      "homeTeam": "Belgium",
+      "awayTeam": "Cyprus",
+      "status": "FINISHED",
+      "score": {
+        "home": 3,
+        "away": 1
+      },
+      "homeFlag": "https://upload.wikimedia.org/wikipedia/commons/5/51/Flag_of_Belgium.svg",
+      "awayFlag": "https://upload.wikimedia.org/wikipedia/commons/d/d0/Flag_of_Cyprus.svg"
+    },
+    {
+      "date": "2025-10-27",
+      "homeTeam": "Denmark",
+      "awayTeam": "Sweden",
+      "status": "FINISHED",
+      "score": {
+        "home": 2,
+        "away": 2
+      },
+      "homeFlag": "https://upload.wikimedia.org/wikipedia/commons/0/0a/Flag_of_Denmark.svg",
+      "awayFlag": "https://upload.wikimedia.org/wikipedia/commons/4/4f/Flag_of_Sweden.svg"
+    },
+    {
+      "date": "2025-10-21",
+      "homeTeam": "Finland",
+      "awayTeam": "Slovakia",
+      "status": "FINISHED",
+      "score": {
+        "home": 1,
+        "away": 2
+      },
+      "homeFlag": "https://upload.wikimedia.org/wikipedia/commons/1/1f/Flag_of_Finland.svg",
+      "awayFlag": "https://upload.wikimedia.org/wikipedia/commons/a/aa/Flag_of_Slovakia.svg"
+    },
+    {
+    "date": "2025-10-21",
+    "homeTeam": "Germany",
+    "awayTeam": "Belgium",
+    "status": "FINISHED",
+    "score": {
+      "home": 2,
+      "away": 0
+    },
+    "homeFlag": "https://upload.wikimedia.org/wikipedia/commons/b/ba/Flag_of_Germany.svg",
+    "awayFlag": "https://upload.wikimedia.org/wikipedia/commons/5/51/Flag_of_Belgium.svg"
+  },
+  {
+    "date": "2025-10-21",
+    "homeTeam": "France",
+    "awayTeam": "Slovenia",
+    "status": "FINISHED",
+    "score": {
+      "home": 5,
+      "away": 0
+    },
+    "homeFlag": "https://upload.wikimedia.org/wikipedia/commons/c/c3/Flag_of_France.svg",
+    "awayFlag": "https://upload.wikimedia.org/wikipedia/commons/a/a2/Flag_of_Slovenia.svg"
+  },
+  {
+    "date": "2025-10-21",
+    "homeTeam": "Turkey",
+    "awayTeam": "Ukraine",
+    "status": "FINISHED",
+    "score": {
+      "home": 2,
+      "away": 0
+    },
+    "homeFlag": "https://upload.wikimedia.org/wikipedia/commons/b/b4/Flag_of_Turkey.svg",
+    "awayFlag": "https://upload.wikimedia.org/wikipedia/commons/4/49/Flag_of_Ukraine.svg"
+  },
+   {
+    "date": "2025-10-22",
+    "homeTeam": "Croatia",
+    "awayTeam": "Czech Republic",
+    "status": "FINISHED",
+    "score": {
+      "home": 3,
+      "away": 2
+    },
+    "homeFlag": "https://upload.wikimedia.org/wikipedia/commons/1/1b/Flag_of_Croatia.svg",
+    "awayFlag": "https://upload.wikimedia.org/wikipedia/commons/1/11/Flag_of_the_Czech_Republic.svg"
+  },
+  {
+    "date": "2025-10-22",
+    "homeTeam": "Poland",
+    "awayTeam": "Romania",
+    "status": "FINISHED",
+    "score": {
+      "home": 2,
+      "away": 3
+    },
+    "homeFlag": "https://upload.wikimedia.org/wikipedia/commons/1/12/Flag_of_Poland.svg",
+    "awayFlag": "https://upload.wikimedia.org/wikipedia/commons/7/73/Flag_of_Romania.svg"
+  },
+  {
+    "date": "2025-10-22",
+    "homeTeam": "Germany",
+    "awayTeam": "Poland",
+    "status": "FINISHED",
+    "score": {
+      "home": 3,
+      "away": 1
+    },
+    "homeFlag": "https://upload.wikimedia.org/wikipedia/commons/b/ba/Flag_of_Germany.svg",
+    "awayFlag": "https://upload.wikimedia.org/wikipedia/commons/1/1c/Flag_of_Poland.svg"
+  },
+  {
+    "date": "2025-10-23",
+    "homeTeam": "France",
+    "awayTeam": "Italy",
+    "status": "FINISHED",
+    "score": {
+      "home": 2,
+      "away": 2
+    },
+    "homeFlag": "https://upload.wikimedia.org/wikipedia/commons/c/c3/Flag_of_France.svg",
+    "awayFlag": "https://upload.wikimedia.org/wikipedia/commons/0/03/Flag_of_Italy.svg"
+  },
+  {
+    "date": "2025-10-23",
+    "homeTeam": "England",
+    "awayTeam": "Netherlands",
+    "status": "FINISHED",
+    "score": {
+      "home": 1,
+      "away": 0
+    },
+    "homeFlag": "https://upload.wikimedia.org/wikipedia/commons/b/be/Flag_of_England.svg",
+    "awayFlag": "https://upload.wikimedia.org/wikipedia/commons/2/20/Flag_of_the_Netherlands.svg"
+  },
+  {
+    "date": "2025-10-23",
+    "homeTeam": "Portugal",
+    "awayTeam": "Spain",
+    "status": "FINISHED",
+    "score": {
+      "home": 1,
+      "away": 2
+    },
+    "homeFlag": "https://upload.wikimedia.org/wikipedia/commons/5/5c/Flag_of_Portugal.svg",
+    "awayFlag": "https://upload.wikimedia.org/wikipedia/en/9/9a/Flag_of_Spain.svg"
+  },
+  {
+    "date": "2025-10-17",
+    "homeTeam": "Sweden",
+    "awayTeam": "Norway",
+    "status": "FINISHED",
+    "score": {
+      "home": 3,
+      "away": 0
+    },
+    "homeFlag": "https://upload.wikimedia.org/wikipedia/commons/4/4f/Flag_of_Sweden.svg",
+    "awayFlag": "https://upload.wikimedia.org/wikipedia/commons/d/d9/Flag_of_Norway.svg"
+  },
+  {
+    "date": "2025-10-19",
+    "homeTeam": "Finland",
+    "awayTeam": "Slovenia",
+    "status": "FINISHED",
+    "score": {
+      "home": 1,
+      "away": 1
+    },
+    "homeFlag": "https://upload.wikimedia.org/wikipedia/commons/1/1f/Flag_of_Finland.svg",
+    "awayFlag": "https://upload.wikimedia.org/wikipedia/commons/a/a2/Flag_of_Slovenia.svg"
+  },
+  {
+    "date": "2025-10-18",
+    "homeTeam": "Ukraine",
+    "awayTeam": "Romania",
+    "status": "FINISHED",
+    "score": {
+      "home": 2,
+      "away": 1
+    },
+    "homeFlag": "https://upload.wikimedia.org/wikipedia/commons/4/49/Flag_of_Ukraine.svg",
+    "awayFlag": "https://upload.wikimedia.org/wikipedia/commons/7/73/Flag_of_Romania.svg"
+  },
+  {
+    "date": "2025-10-27",
+    "homeTeam": "Russia",
+    "awayTeam": "Czech Republic",
+    "status": "FINISHED",
+    "score": {
+      "home": 3,
+      "away": 2
+    },
+    "homeFlag": "https://upload.wikimedia.org/wikipedia/commons/f/f3/Flag_of_Russia.svg",
+    "awayFlag": "https://upload.wikimedia.org/wikipedia/commons/5/56/Flag_of_the_Czech_Republic.svg"
+  },
+
+  {
+    "date": "2025-10-28",
+    "homeTeam": "Bayern Munich",
+    "awayTeam": "Barcelona",
+    "status": "UPCOMING",
+    "homeFlag": "https://upload.wikimedia.org/wikipedia/commons/1/1b/Flag_of_Germany.svg",
+    "awayFlag": "https://upload.wikimedia.org/wikipedia/commons/4/47/Flag_of_Spain.svg"
+  },
+  {
+    "date": "2025-10-28",
+    "homeTeam": "Paris Saint-Germain",
+    "awayTeam": "Manchester City",
+    "status": "UPCOMING",
+    "homeFlag": "https://upload.wikimedia.org/wikipedia/commons/6/62/Flag_of_France.svg",
+    "awayFlag": "https://upload.wikimedia.org/wikipedia/commons/5/5b/Flag_of_England.svg"
+  },
+  {
+    "date": "2025-10-29",
+    "homeTeam": "Chelsea",
+    "awayTeam": "Real Madrid",
+    "status": "UPCOMING",
+    "homeFlag": "https://upload.wikimedia.org/wikipedia/commons/a/a5/Flag_of_Chelsea_FC.svg",
+    "awayFlag": "https://upload.wikimedia.org/wikipedia/commons/2/27/Flag_of_Real_Madrid.svg"
+  },
+  {
+    "date": "2025-10-29",
+    "homeTeam": "Liverpool",
+    "awayTeam": "Juventus",
+    "status": "UPCOMING",
+    "homeFlag": "https://upload.wikimedia.org/wikipedia/commons/8/8b/Flag_of_Liverpool_FC.svg",
+    "awayFlag": "https://upload.wikimedia.org/wikipedia/commons/3/3c/Flag_of_Italy.svg"
+  },
+  {
+    "date": "2025-10-29",
+    "homeTeam": "Arsenal",
+    "awayTeam": "AC Milan",
+    "status": "UPCOMING",
+    "homeFlag": "https://upload.wikimedia.org/wikipedia/commons/5/53/Flag_of_Arsenal_FC.svg",
+    "awayFlag": "https://upload.wikimedia.org/wikipedia/commons/f/f2/Flag_of_AC_Milan.svg"
+  },
+  {
+    "date": "2025-10-27",
+    "homeTeam": "BVB Dortmund",
+    "awayTeam": "Ajax",
+    "status": "UPCOMING",
+    "homeFlag": "https://upload.wikimedia.org/wikipedia/commons/0/02/Flag_of_Borussia_Dortmund.svg",
+    "awayFlag": "https://upload.wikimedia.org/wikipedia/commons/4/42/Flag_of_Ajax_Amsterdam.svg"
+  },
+  {
+    "date": "2025-10-21",
+    "homeTeam": "RB Leipzig",
+    "awayTeam": "Bayer Leverkusen",
+    "status": "UPCOMING",
+    "homeFlag": "https://upload.wikimedia.org/wikipedia/commons/a/a0/Flag_of_RB_Leipzig.svg",
+    "awayFlag": "https://upload.wikimedia.org/wikipedia/commons/f/fd/Flag_of_Bayer_Leverkusen.svg"
+  },
+  {
+    "date": "2025-10-21",
+    "homeTeam": "Atletico Madrid",
+    "awayTeam": "Benfica",
+    "status": "UPCOMING",
+    "homeFlag": "https://upload.wikimedia.org/wikipedia/commons/7/75/Flag_of_Atletico_Madrid.svg",
+    "awayFlag": "https://upload.wikimedia.org/wikipedia/commons/6/60/Flag_of_Benfica.svg"
+  },
+  {
+    "date": "2025-10-22",
+    "homeTeam": "Paris Saint-Germain",
+    "awayTeam": "Juventus",
+    "status": "UPCOMING",
+    "homeFlag": "https://upload.wikimedia.org/wikipedia/commons/6/62/Flag_of_France.svg",
+    "awayFlag": "https://upload.wikimedia.org/wikipedia/commons/3/3c/Flag_of_Italy.svg"
+  },
+  {
+    "date": "2025-10-22",
+    "homeTeam": "Manchester City",
+    "awayTeam": "Inter Milan",
+    "status": "UPCOMING",
+    "homeFlag": "https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg",
+    "awayFlag": "https://upload.wikimedia.org/wikipedia/en/0/0b/FC_Internazionale_Milano_2021.svg"
+},
+{
+    "date": "2025-10-22",
+    "homeTeam": "Real Madrid",
+    "awayTeam": "Arsenal",
+    "status": "UPCOMING",
+    "homeFlag": "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg",
+    "awayFlag": "https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg"
+},
+{
+    "date": "2025-10-23",
+    "homeTeam": "AC Milan",
+    "awayTeam": "Borussia Dortmund",
+    "status": "UPCOMING",
+    "homeFlag": "https://upload.wikimedia.org/wikipedia/commons/d/d0/Flag_of_AC_Milan.svg",
+    "awayFlag": "https://upload.wikimedia.org/wikipedia/commons/6/67/Borussia_Dortmund_flag.svg"
+},
+{
+    "date": "2025-10-23",
+    "homeTeam": "Liverpool",
+    "awayTeam": "Barcelona",
+    "status": "UPCOMING",
+    "homeFlag": "https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg",
+    "awayFlag": "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg"
+},
+{
+    "date": "2025-10-26",
+    "homeTeam": "Chelsea",
+    "awayTeam": "Napoli",
+    "status": "UPCOMING",
+    "homeFlag": "https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg",
+    "awayFlag": "https://upload.wikimedia.org/wikipedia/en/2/2d/SSC_Napoli.svg"
+},
+{
+    "date": "2025-10-24",
+    "homeTeam": "Porto",
+    "awayTeam": "Ajax",
+    "status": "UPCOMING",
+    "homeFlag": "https://upload.wikimedia.org/wikipedia/en/f/f1/FC_Porto.svg",
+    "awayFlag": "https://upload.wikimedia.org/wikipedia/en/7/79/Ajax_Amsterdam.svg"
+},
+{
+    "date": "2025-10-25",
+    "homeTeam": "Bayern Munich",
+    "awayTeam": "Tottenham Hotspur",
+    "status": "UPCOMING",
+    "homeFlag": "https://upload.wikimedia.org/wikipedia/en/1/1f/FC_Bayern_München_logo_%282017%29.svg",
+    "awayFlag": "https://upload.wikimedia.org/wikipedia/en/b/b4/Tottenham_Hotspur.svg"
+},
+{
+    "date": "2025-10-25",
+    "homeTeam": "Galatasaray",
+    "awayTeam": "Celtic",
+    "status": "UPCOMING",
+    "homeFlag": "https://upload.wikimedia.org/wikipedia/en/3/3a/Galatasaray_Sports_Club_Logo.svg",
+    "awayFlag": "https://upload.wikimedia.org/wikipedia/en/9/9a/Celtic_FC.svg"
+}
+
+
+  ]
+}
