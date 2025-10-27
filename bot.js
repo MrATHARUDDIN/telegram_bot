@@ -1,6 +1,5 @@
 const express = require("express");
 const fs = require("fs").promises;
-const path = require("path");
 const TelegramBot = require("node-telegram-bot-api");
 
 // === CONFIG ===
@@ -20,11 +19,21 @@ async function readMatches() {
   return json.matches;
 }
 
+// === Telegram Commands Keyboard ===
+const mainKeyboard = {
+  reply_markup: {
+    keyboard: [
+      ["/upcoming", "/finished"],
+      ["/prediction"],["/mypredictions"],
+      ["/allpredictions"]
+    ],
+    resize_keyboard: true,
+    one_time_keyboard: false
+  }
+};
 
 // === Express routes ===
-app.get("/", (req, res) => {
-  res.send("GET request to the homepage");
-});
+app.get("/", (req, res) => res.send("GET request to the homepage"));
 
 app.get("/matches", async (req, res) => {
   try {
@@ -37,12 +46,11 @@ app.get("/matches", async (req, res) => {
 });
 
 // === Telegram Commands ===
-
-// /start
 bot.onText(/\/start/, (msg) => {
   bot.sendMessage(
     msg.chat.id,
-    "Welcome! ⚽\n\nUse:\n/upcoming - see matches for next 7 days\n/finished - see last week's matches"
+    "Welcome! ⚽\n\nAvailable commands:\n/upcoming - see upcoming matches\n/finished - see last week's matches\n/prediction - make a prediction",
+    mainKeyboard
   );
 });
 
@@ -50,67 +58,56 @@ bot.onText(/\/upcoming/, async (msg) => {
   const chatId = msg.chat.id;
   try {
     const matches = await readMatches();
-
     const now = new Date();
-    const nextWeek = new Date();
-    nextWeek.setDate(now.getDate() + 7);
 
-    const upcoming = matches.filter((m) => {
-      const matchDate = new Date(m.date);
-      return matchDate >= now && matchDate <= nextWeek && m.status === "UPCOMING";
-    });
+    const upcoming = matches.filter(m => new Date(m.date) >= now && m.status === "UPCOMING");
 
     if (upcoming.length === 0) {
-      return bot.sendMessage(chatId, "No upcoming matches in the next 7 days ⚽");
+      return bot.sendMessage(chatId, "No upcoming matches ⚽", mainKeyboard);
     }
 
     const message = upcoming
-      .map(
-        (m) =>
-          `🏟️ ${m.homeTeam} vs ${m.awayTeam}\n📅 ${m.date}\n📍 ${m.homeFlag} vs ${m.awayFlag}`
+      .map(m =>
+        `🏟️ ${m.homeTeam} vs ${m.awayTeam}\n📅 ${m.date}\n🌐 [${m.homeTeam}](${m.homeFlag}) vs [${m.awayTeam}](${m.awayFlag})`
       )
       .join("\n\n");
 
-    bot.sendMessage(chatId, message);
+    bot.sendMessage(chatId, message, { ...mainKeyboard, parse_mode: "Markdown" });
   } catch (error) {
     console.error(error);
-    bot.sendMessage(chatId, "Error loading upcoming matches ❌");
+    bot.sendMessage(chatId, "Error loading upcoming matches ❌", mainKeyboard);
   }
 });
-
 
 bot.onText(/\/finished/, async (msg) => {
   const chatId = msg.chat.id;
   try {
     const matches = await readMatches();
-
     const now = new Date();
     const lastWeek = new Date();
     lastWeek.setDate(now.getDate() - 7);
 
-    const finished = matches.filter((m) => {
+    const finished = matches.filter(m => {
       const matchDate = new Date(m.date);
       return matchDate >= lastWeek && matchDate <= now && m.status === "FINISHED";
     });
 
     if (finished.length === 0) {
-      return bot.sendMessage(chatId, "No finished matches in the last week 🏁");
+      return bot.sendMessage(chatId, "No finished matches in the last week 🏁", mainKeyboard);
     }
 
     const message = finished
-      .map(
-        (m) =>
-          `✅ ${m.homeTeam} vs ${m.awayTeam}\n📅 ${m.date}\n🏁 ${m.homeFlag} ${m.score.home} - ${m.score.away} ${m.awayFlag}`
+      .map(m =>
+        `✅ ${m.homeTeam} vs ${m.awayTeam}\n📅 ${m.date}\n🏁 [${m.homeTeam}](${m.homeFlag}) ${m.score.home} - ${m.score.away} [${m.awayTeam}](${m.awayFlag})`
       )
       .join("\n\n");
 
-    bot.sendMessage(chatId, message);
+    bot.sendMessage(chatId, message, { ...mainKeyboard, parse_mode: "Markdown" });
   } catch (error) {
     console.error(error);
-    bot.sendMessage(chatId, "Error loading finished matches ❌");
+    bot.sendMessage(chatId, "Error loading finished matches ❌", mainKeyboard);
   }
 });
-
 
 // === User predictions ===
 const userStates = {};
@@ -120,51 +117,103 @@ bot.onText(/\/prediction/, async (msg) => {
 
   try {
     const matches = await readMatches();
-
     const now = new Date();
-    const nextWeek = new Date();
-    nextWeek.setDate(now.getDate() + 7);
 
-    const upcoming = matches.filter((m) => {
-      const matchDate = new Date(m.date);
-      return matchDate >= now && matchDate <= nextWeek && m.status === "UPCOMING";
-    });
+    const futureMatches = matches.filter(m => new Date(m.date) >= now && m.status === "UPCOMING");
 
-    if (upcoming.length === 0) {
-      return bot.sendMessage(chatId, "No upcoming matches available for prediction ⚽");
+    if (futureMatches.length === 0) {
+      return bot.sendMessage(chatId, "No future matches available for prediction ⚽", mainKeyboard);
     }
 
-    // Save user state
-    userStates[chatId] = { step: "choose_match", matches: upcoming };
+    userStates[chatId] = { step: "choose_match", matches: futureMatches };
 
-    // Show upcoming matches as numbered list
-    const matchList = upcoming
+    const matchList = futureMatches
       .map((m, i) => `${i + 1}. ${m.homeTeam} vs ${m.awayTeam} (${m.date})`)
       .join("\n");
 
     bot.sendMessage(
       chatId,
-      `🔮 Choose a match to predict by sending its number:\n\n${matchList}`
+      `🔮 Choose a match to predict by sending its number:\n\n${matchList}`,
+      mainKeyboard
     );
   } catch (error) {
     console.error(error);
-    bot.sendMessage(chatId, "Error loading matches ❌");
+    bot.sendMessage(chatId, "Error loading matches ❌", mainKeyboard);
   }
 });
 
-// Handle user replies (match selection + prediction)
+// === View user's predictions ===
+bot.onText(/\/mypredictions/, async (msg) => {
+  const chatId = msg.chat.id;
+  const username = msg.from.username || msg.from.first_name;
+
+  try {
+    let predictions = [];
+    try {
+      const data = await fs.readFile("predictions.json", "utf8");
+      predictions = JSON.parse(data);
+    } catch {
+      predictions = [];
+    }
+
+    const userPredictions = predictions.filter(p => p.user === username);
+
+    if (userPredictions.length === 0) {
+      return bot.sendMessage(chatId, "You have no predictions yet ⚽", mainKeyboard);
+    }
+
+    const message = userPredictions
+      .map(p => `🔮 ${p.match} on ${p.date}\nPrediction: ${p.prediction.home} - ${p.prediction.away}`)
+      .join("\n\n");
+
+    bot.sendMessage(chatId, message, mainKeyboard);
+  } catch (err) {
+    console.error(err);
+    bot.sendMessage(chatId, "❌ Failed to load your predictions.", mainKeyboard);
+  }
+});
+
+bot.onText(/\/allpredictions/, async (msg) => {
+  const chatId = msg.chat.id;
+
+  try {
+    const data = await fs.readFile("predictions.json", "utf8");
+    const predictions = JSON.parse(data);
+
+    if (!predictions.length) {
+      return bot.sendMessage(chatId, "No predictions have been made yet ⚽", mainKeyboard);
+    }
+
+    // Group predictions by match
+    const grouped = {};
+    predictions.forEach(p => {
+      if (!grouped[p.match]) grouped[p.match] = [];
+      grouped[p.match].push(`${p.user}: ${p.prediction.home}-${p.prediction.away}`);
+    });
+
+    const message = Object.entries(grouped)
+      .map(([match, preds]) => `🏟️ ${match}\n${preds.join("\n")}`)
+      .join("\n\n");
+
+    bot.sendMessage(chatId, message, mainKeyboard);
+  } catch (err) {
+    console.error(err);
+    bot.sendMessage(chatId, "❌ Failed to load all predictions.", mainKeyboard);
+  }
+});
+
+
+// Handle user replies
 bot.on("message", async (msg) => {
   const chatId = msg.chat.id;
   const text = msg.text;
-
   const state = userStates[chatId];
-  if (!state) return; // not in prediction mode
+  if (!state) return;
 
-  // Step 1 — user chooses a match
   if (state.step === "choose_match") {
     const index = parseInt(text) - 1;
     if (isNaN(index) || index < 0 || index >= state.matches.length) {
-      return bot.sendMessage(chatId, "❌ Invalid choice. Please send a valid match number.");
+      return bot.sendMessage(chatId, "❌ Invalid choice. Send a valid match number.", mainKeyboard);
     }
 
     state.selectedMatch = state.matches[index];
@@ -172,56 +221,45 @@ bot.on("message", async (msg) => {
 
     return bot.sendMessage(
       chatId,
-      `You selected:\n${state.selectedMatch.homeTeam} vs ${state.selectedMatch.awayTeam}\n\nNow send your prediction like this:\n\n2-1`
+      `You selected:\n${state.selectedMatch.homeTeam} vs ${state.selectedMatch.awayTeam}\n\nSend your prediction like: 2-1`,
+      mainKeyboard
     );
   }
 
-  // Step 2 — user enters score
   if (state.step === "enter_score") {
     const parts = text.split("-");
     if (parts.length !== 2 || isNaN(parts[0]) || isNaN(parts[1])) {
-      return bot.sendMessage(chatId, "❌ Please enter a valid score, e.g. 2-1");
+      return bot.sendMessage(chatId, "❌ Invalid score. Example: 2-1", mainKeyboard);
     }
 
     const prediction = {
       user: msg.from.username || msg.from.first_name,
       match: `${state.selectedMatch.homeTeam} vs ${state.selectedMatch.awayTeam}`,
       date: state.selectedMatch.date,
-      prediction: {
-        home: parseInt(parts[0]),
-        away: parseInt(parts[1]),
-      },
+      prediction: { home: parseInt(parts[0]), away: parseInt(parts[1]) },
     };
 
     try {
-      // Read existing predictions
       let existing = [];
       try {
         const data = await fs.readFile("predictions.json", "utf8");
         existing = JSON.parse(data);
-      } catch {
-        existing = [];
-      }
-
-      // Save new prediction
+      } catch {}
       existing.push(prediction);
       await fs.writeFile("predictions.json", JSON.stringify(existing, null, 2));
 
       bot.sendMessage(
         chatId,
-        `✅ Prediction saved:\n${prediction.match}\n${prediction.prediction.home} - ${prediction.prediction.away}`
+        `✅ Prediction saved:\n${prediction.match}\n${prediction.prediction.home} - ${prediction.prediction.away}`,
+        mainKeyboard
       );
     } catch (err) {
       console.error(err);
-      bot.sendMessage(chatId, "❌ Failed to save your prediction.");
+      bot.sendMessage(chatId, "❌ Failed to save prediction.", mainKeyboard);
     }
-    // Clear user state
+
     delete userStates[chatId];
   }
 });
 
-
-
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
