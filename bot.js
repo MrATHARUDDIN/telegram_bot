@@ -16,8 +16,10 @@ const bot = new TelegramBot(TELEGRAM_TOKEN, { polling: true });
 // === Helper: read matches ===
 async function readMatches() {
   const data = await fs.readFile("matches.json", "utf8");
-  return JSON.parse(data);
+  const json = JSON.parse(data);
+  return json.matches;
 }
+
 
 // === Express routes ===
 app.get("/", (req, res) => {
@@ -108,6 +110,116 @@ bot.onText(/\/finished/, async (msg) => {
     bot.sendMessage(chatId, "Error loading finished matches ❌");
   }
 });
+
+
+// === User predictions ===
+const userStates = {};
+
+bot.onText(/\/prediction/, async (msg) => {
+  const chatId = msg.chat.id;
+
+  try {
+    const matches = await readMatches();
+
+    const now = new Date();
+    const nextWeek = new Date();
+    nextWeek.setDate(now.getDate() + 7);
+
+    const upcoming = matches.filter((m) => {
+      const matchDate = new Date(m.date);
+      return matchDate >= now && matchDate <= nextWeek && m.status === "UPCOMING";
+    });
+
+    if (upcoming.length === 0) {
+      return bot.sendMessage(chatId, "No upcoming matches available for prediction ⚽");
+    }
+
+    // Save user state
+    userStates[chatId] = { step: "choose_match", matches: upcoming };
+
+    // Show upcoming matches as numbered list
+    const matchList = upcoming
+      .map((m, i) => `${i + 1}. ${m.homeTeam} vs ${m.awayTeam} (${m.date})`)
+      .join("\n");
+
+    bot.sendMessage(
+      chatId,
+      `🔮 Choose a match to predict by sending its number:\n\n${matchList}`
+    );
+  } catch (error) {
+    console.error(error);
+    bot.sendMessage(chatId, "Error loading matches ❌");
+  }
+});
+
+// Handle user replies (match selection + prediction)
+bot.on("message", async (msg) => {
+  const chatId = msg.chat.id;
+  const text = msg.text;
+
+  const state = userStates[chatId];
+  if (!state) return; // not in prediction mode
+
+  // Step 1 — user chooses a match
+  if (state.step === "choose_match") {
+    const index = parseInt(text) - 1;
+    if (isNaN(index) || index < 0 || index >= state.matches.length) {
+      return bot.sendMessage(chatId, "❌ Invalid choice. Please send a valid match number.");
+    }
+
+    state.selectedMatch = state.matches[index];
+    state.step = "enter_score";
+
+    return bot.sendMessage(
+      chatId,
+      `You selected:\n${state.selectedMatch.homeTeam} vs ${state.selectedMatch.awayTeam}\n\nNow send your prediction like this:\n\n2-1`
+    );
+  }
+
+  // Step 2 — user enters score
+  if (state.step === "enter_score") {
+    const parts = text.split("-");
+    if (parts.length !== 2 || isNaN(parts[0]) || isNaN(parts[1])) {
+      return bot.sendMessage(chatId, "❌ Please enter a valid score, e.g. 2-1");
+    }
+
+    const prediction = {
+      user: msg.from.username || msg.from.first_name,
+      match: `${state.selectedMatch.homeTeam} vs ${state.selectedMatch.awayTeam}`,
+      date: state.selectedMatch.date,
+      prediction: {
+        home: parseInt(parts[0]),
+        away: parseInt(parts[1]),
+      },
+    };
+
+    try {
+      // Read existing predictions
+      let existing = [];
+      try {
+        const data = await fs.readFile("predictions.json", "utf8");
+        existing = JSON.parse(data);
+      } catch {
+        existing = [];
+      }
+
+      // Save new prediction
+      existing.push(prediction);
+      await fs.writeFile("predictions.json", JSON.stringify(existing, null, 2));
+
+      bot.sendMessage(
+        chatId,
+        `✅ Prediction saved:\n${prediction.match}\n${prediction.prediction.home} - ${prediction.prediction.away}`
+      );
+    } catch (err) {
+      console.error(err);
+      bot.sendMessage(chatId, "❌ Failed to save your prediction.");
+    }
+    // Clear user state
+    delete userStates[chatId];
+  }
+});
+
 
 
 app.listen(PORT, () => {
