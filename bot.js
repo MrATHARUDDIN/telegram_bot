@@ -8,6 +8,8 @@ const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN || "8482145476:AAGnV_DR2vvERiw
 
 const app = express();
 app.use(express.json());
+const userEmails = {};
+const userStates = {}; // ✅ Moved to top so ALL features can use it
 
 // === TELEGRAM BOT ===
 const bot = new TelegramBot(TELEGRAM_TOKEN, { polling: true });
@@ -19,12 +21,11 @@ async function readMatches() {
   return json.matches;
 }
 
-// === Telegram Commands Keyboard ===
 const mainKeyboard = {
   reply_markup: {
     keyboard: [
       ["/upcoming", "/finished"],
-      ["/prediction"],["/mypredictions"],
+      ["/prediction"], ["/mypredictions"],
       ["/allpredictions"]
     ],
     resize_keyboard: true,
@@ -45,15 +46,103 @@ app.get("/matches", async (req, res) => {
   }
 });
 
-// === Telegram Commands ===
+// === START COMMAND (Email Input Fix) ===
 bot.onText(/\/start/, (msg) => {
+  const chatId = msg.chat.id;
+
   bot.sendMessage(
-    msg.chat.id,
-    "Welcome! ⚽\n\nAvailable commands:\n/upcoming - see upcoming matches\n/finished - see last week's matches\n/prediction - make a prediction",
-    mainKeyboard
+    chatId,
+    "Welcome! ⚽\n\nPlease enter your email address to continue:"
   );
+
+  userStates[chatId] = { step: "enter_email" }; // ✅ Track email step
 });
 
+// === Global Message Handler (Email + Prediction Flow) ===
+bot.on("message", async (msg) => {
+  const chatId = msg.chat.id;
+  const text = msg.text;
+  const state = userStates[chatId];
+
+  // Ignore other commands while inside the email step
+  if (text.startsWith("/") && state?.step === "enter_email") return;
+
+  // ✅ Email entry step
+  if (state?.step === "enter_email") {
+    const email = text.trim();
+
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      return bot.sendMessage(chatId, "❌ Invalid email. Try again:");
+    }
+
+    userEmails[chatId] = email;
+    delete userStates[chatId]; // clear email state
+
+    return bot.sendMessage(
+      chatId,
+      `✅ Thanks, ${email} saved!\n\nAvailable commands:\n/upcoming\n/finished\n/prediction`,
+      mainKeyboard
+    );
+  }
+
+  // ✅ If no state, ignore this handler
+  if (!state) return;
+
+  // === Prediction Match Selection ===
+  if (state.step === "choose_match") {
+    const index = parseInt(text) - 1;
+    if (isNaN(index) || index < 0 || index >= state.matches.length) {
+      return bot.sendMessage(chatId, "❌ Invalid choice. Send a valid match number.", mainKeyboard);
+    }
+
+    state.selectedMatch = state.matches[index];
+    state.step = "enter_score";
+
+    return bot.sendMessage(
+      chatId,
+      `You selected:\n${state.selectedMatch.homeTeam} vs ${state.selectedMatch.awayTeam}\n\nSend your prediction like: 2-1`,
+      mainKeyboard
+    );
+  }
+
+  // === Prediction Score Entry ===
+  if (state.step === "enter_score") {
+    const parts = text.split("-");
+    if (parts.length !== 2 || isNaN(parts[0]) || isNaN(parts[1])) {
+      return bot.sendMessage(chatId, "❌ Invalid score. Example: 2-1", mainKeyboard);
+    }
+
+    const prediction = {
+      user: msg.from.username || msg.from.first_name,
+      match: `${state.selectedMatch.homeTeam} vs ${state.selectedMatch.awayTeam}`,
+      date: state.selectedMatch.date,
+      prediction: { home: parseInt(parts[0]), away: parseInt(parts[1]) },
+    };
+
+    try {
+      let existing = [];
+      try {
+        const data = await fs.readFile("predictions.json", "utf8");
+        existing = JSON.parse(data);
+      } catch {}
+      existing.push(prediction);
+      await fs.writeFile("predictions.json", JSON.stringify(existing, null, 2));
+
+      bot.sendMessage(
+        chatId,
+        `✅ Prediction saved:\n${prediction.match}\n${prediction.prediction.home} - ${prediction.prediction.away}`,
+        mainKeyboard
+      );
+    } catch (err) {
+      console.error(err);
+      bot.sendMessage(chatId, "❌ Failed to save prediction.", mainKeyboard);
+    }
+
+    delete userStates[chatId];
+  }
+});
+
+// === Upcoming Matches ===
 bot.onText(/\/upcoming/, async (msg) => {
   const chatId = msg.chat.id;
   try {
@@ -68,17 +157,18 @@ bot.onText(/\/upcoming/, async (msg) => {
 
     const message = upcoming
       .map(m =>
-        `🏟️ ${m.homeTeam} vs ${m.awayTeam}\n📅 ${m.date}\n🌐 [${m.homeTeam}](${m.homeFlag}) vs [${m.awayTeam}](${m.awayFlag})`
+        `🏟️ ${m.homeTeam} vs ${m.awayTeam}\n📅 ${m.date}`
       )
       .join("\n\n");
 
-    bot.sendMessage(chatId, message, { ...mainKeyboard, parse_mode: "Markdown" });
+    bot.sendMessage(chatId, message, mainKeyboard);
   } catch (error) {
     console.error(error);
     bot.sendMessage(chatId, "Error loading upcoming matches ❌", mainKeyboard);
   }
 });
 
+// === Finished Matches ===
 bot.onText(/\/finished/, async (msg) => {
   const chatId = msg.chat.id;
   try {
@@ -98,11 +188,11 @@ bot.onText(/\/finished/, async (msg) => {
 
     const message = finished
       .map(m =>
-        `✅ ${m.homeTeam} vs ${m.awayTeam}\n📅 ${m.date}\n🏁 [${m.homeTeam}](${m.homeFlag}) ${m.score.home} - ${m.score.away} [${m.awayTeam}](${m.awayFlag})`
+        `✅ ${m.homeTeam} vs ${m.awayTeam}\n📅 ${m.date}\n🏁 ${m.score.home} - ${m.score.away}`
       )
       .join("\n\n");
 
-    bot.sendMessage(chatId, message, { ...mainKeyboard, parse_mode: "Markdown" });
+    bot.sendMessage(chatId, message, mainKeyboard);
   } catch (error) {
     console.error(error);
     bot.sendMessage(chatId, "Error loading finished matches ❌", mainKeyboard);
@@ -110,8 +200,6 @@ bot.onText(/\/finished/, async (msg) => {
 });
 
 // === User predictions ===
-const userStates = {};
-
 bot.onText(/\/prediction/, async (msg) => {
   const chatId = msg.chat.id;
 
@@ -173,6 +261,7 @@ bot.onText(/\/mypredictions/, async (msg) => {
   }
 });
 
+// === Show all predictions ===
 bot.onText(/\/allpredictions/, async (msg) => {
   const chatId = msg.chat.id;
 
@@ -184,7 +273,6 @@ bot.onText(/\/allpredictions/, async (msg) => {
       return bot.sendMessage(chatId, "No predictions have been made yet ⚽", mainKeyboard);
     }
 
-    // Group predictions by match
     const grouped = {};
     predictions.forEach(p => {
       if (!grouped[p.match]) grouped[p.match] = [];
@@ -199,66 +287,6 @@ bot.onText(/\/allpredictions/, async (msg) => {
   } catch (err) {
     console.error(err);
     bot.sendMessage(chatId, "❌ Failed to load all predictions.", mainKeyboard);
-  }
-});
-
-
-// Handle user replies
-bot.on("message", async (msg) => {
-  const chatId = msg.chat.id;
-  const text = msg.text;
-  const state = userStates[chatId];
-  if (!state) return;
-
-  if (state.step === "choose_match") {
-    const index = parseInt(text) - 1;
-    if (isNaN(index) || index < 0 || index >= state.matches.length) {
-      return bot.sendMessage(chatId, "❌ Invalid choice. Send a valid match number.", mainKeyboard);
-    }
-
-    state.selectedMatch = state.matches[index];
-    state.step = "enter_score";
-
-    return bot.sendMessage(
-      chatId,
-      `You selected:\n${state.selectedMatch.homeTeam} vs ${state.selectedMatch.awayTeam}\n\nSend your prediction like: 2-1`,
-      mainKeyboard
-    );
-  }
-
-  if (state.step === "enter_score") {
-    const parts = text.split("-");
-    if (parts.length !== 2 || isNaN(parts[0]) || isNaN(parts[1])) {
-      return bot.sendMessage(chatId, "❌ Invalid score. Example: 2-1", mainKeyboard);
-    }
-
-    const prediction = {
-      user: msg.from.username || msg.from.first_name,
-      match: `${state.selectedMatch.homeTeam} vs ${state.selectedMatch.awayTeam}`,
-      date: state.selectedMatch.date,
-      prediction: { home: parseInt(parts[0]), away: parseInt(parts[1]) },
-    };
-
-    try {
-      let existing = [];
-      try {
-        const data = await fs.readFile("predictions.json", "utf8");
-        existing = JSON.parse(data);
-      } catch {}
-      existing.push(prediction);
-      await fs.writeFile("predictions.json", JSON.stringify(existing, null, 2));
-
-      bot.sendMessage(
-        chatId,
-        `✅ Prediction saved:\n${prediction.match}\n${prediction.prediction.home} - ${prediction.prediction.away}`,
-        mainKeyboard
-      );
-    } catch (err) {
-      console.error(err);
-      bot.sendMessage(chatId, "❌ Failed to save prediction.", mainKeyboard);
-    }
-
-    delete userStates[chatId];
   }
 });
 
