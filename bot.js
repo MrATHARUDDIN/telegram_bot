@@ -9,7 +9,7 @@ const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN || "8482145476:AAGnV_DR2vvERiw
 const app = express();
 app.use(express.json());
 const userEmails = {};
-const userStates = {}; // ✅ Moved to top so ALL features can use it
+const userStates = {};
 
 // === TELEGRAM BOT ===
 const bot = new TelegramBot(TELEGRAM_TOKEN, { polling: true });
@@ -19,6 +19,26 @@ async function readMatches() {
   const data = await fs.readFile("matches.json", "utf8");
   const json = JSON.parse(data);
   return json.matches;
+}
+
+// === Helper: read predictions (with file creation if doesn't exist) ===
+async function readPredictions() {
+  try {
+    const data = await fs.readFile("predictions.json", "utf8");
+    return JSON.parse(data);
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      // File doesn't exist, create it with empty array
+      await fs.writeFile("predictions.json", "[]");
+      return [];
+    }
+    throw error;
+  }
+}
+
+// === Helper: write predictions ===
+async function writePredictions(predictions) {
+  await fs.writeFile("predictions.json", JSON.stringify(predictions, null, 2));
 }
 
 const mainKeyboard = {
@@ -80,7 +100,7 @@ bot.on("message", async (msg) => {
 
     return bot.sendMessage(
       chatId,
-      `✅ Thanks, ${email} saved!\n\nAvailable commands:\n/upcoming\n/finished\n/prediction`,
+      `✅ Thanks, ${email} saved!\n\nAvailable commands:\n/upcoming\n/finished\n/prediction\n/mypredictions\n/allpredictions`,
       mainKeyboard
     );
   }
@@ -112,21 +132,26 @@ bot.on("message", async (msg) => {
       return bot.sendMessage(chatId, "❌ Invalid score. Example: 2-1", mainKeyboard);
     }
 
+    const homeScore = parseInt(parts[0]);
+    const awayScore = parseInt(parts[1]);
+
+    if (homeScore < 0 || awayScore < 0) {
+      return bot.sendMessage(chatId, "❌ Score cannot be negative. Example: 2-1", mainKeyboard);
+    }
+
     const prediction = {
       user: msg.from.username || msg.from.first_name,
+      userId: msg.from.id,
       match: `${state.selectedMatch.homeTeam} vs ${state.selectedMatch.awayTeam}`,
       date: state.selectedMatch.date,
-      prediction: { home: parseInt(parts[0]), away: parseInt(parts[1]) },
+      prediction: { home: homeScore, away: awayScore },
+      timestamp: new Date().toISOString()
     };
 
     try {
-      let existing = [];
-      try {
-        const data = await fs.readFile("predictions.json", "utf8");
-        existing = JSON.parse(data);
-      } catch {}
+      const existing = await readPredictions();
       existing.push(prediction);
-      await fs.writeFile("predictions.json", JSON.stringify(existing, null, 2));
+      await writePredictions(existing);
 
       bot.sendMessage(
         chatId,
@@ -203,6 +228,15 @@ bot.onText(/\/finished/, async (msg) => {
 bot.onText(/\/prediction/, async (msg) => {
   const chatId = msg.chat.id;
 
+  // Check if user has registered email
+  if (!userEmails[chatId]) {
+    return bot.sendMessage(
+      chatId, 
+      "Please register your email first using /start",
+      mainKeyboard
+    );
+  }
+
   try {
     const matches = await readMatches();
     const now = new Date();
@@ -236,14 +270,7 @@ bot.onText(/\/mypredictions/, async (msg) => {
   const username = msg.from.username || msg.from.first_name;
 
   try {
-    let predictions = [];
-    try {
-      const data = await fs.readFile("predictions.json", "utf8");
-      predictions = JSON.parse(data);
-    } catch {
-      predictions = [];
-    }
-
+    const predictions = await readPredictions();
     const userPredictions = predictions.filter(p => p.user === username);
 
     if (userPredictions.length === 0) {
@@ -266,8 +293,7 @@ bot.onText(/\/allpredictions/, async (msg) => {
   const chatId = msg.chat.id;
 
   try {
-    const data = await fs.readFile("predictions.json", "utf8");
-    const predictions = JSON.parse(data);
+    const predictions = await readPredictions();
 
     if (!predictions.length) {
       return bot.sendMessage(chatId, "No predictions have been made yet ⚽", mainKeyboard);
@@ -290,4 +316,40 @@ bot.onText(/\/allpredictions/, async (msg) => {
   }
 });
 
-app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+// === Help command ===
+bot.onText(/\/help/, (msg) => {
+  const chatId = msg.chat.id;
+  const helpMessage = `
+🤖 *Bot Commands:*
+
+/start - Register with your email
+/upcoming - Show upcoming matches
+/finished - Show recent finished matches
+/prediction - Make a prediction
+/mypredictions - View your predictions
+/allpredictions - View all users' predictions
+/help - Show this help message
+
+*How to use:*
+1. Start with /start to register
+2. Use /prediction to make predictions
+3. Check /mypredictions to see your predictions
+  `;
+
+  bot.sendMessage(chatId, helpMessage, mainKeyboard);
+});
+
+// Initialize predictions file on startup
+async function initializeBot() {
+  try {
+    await readPredictions(); // This will create the file if it doesn't exist
+    console.log("Bot initialized successfully");
+  } catch (error) {
+    console.error("Failed to initialize bot:", error);
+  }
+}
+
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+  initializeBot();
+});
