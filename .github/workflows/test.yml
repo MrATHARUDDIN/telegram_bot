@@ -1,0 +1,31 @@
+name: Run Telegram Bot
+
+on:
+  workflow_dispatch:   # You run it manually
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run bot
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          PORT: 4040
+        run: |
+          echo "Starting bot..."
+          node bot.js
+
+
+          
