@@ -16,9 +16,10 @@ jobs:
         with:
           node-version: "18"
 
-      - name: Install dependencies
+      - name: Install npm
         run: npm install
-        
+
+      - name: Install telegram api
          npm install node-telegram-bot-api --save
 
       - name: Run bot
